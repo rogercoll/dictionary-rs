@@ -6,7 +6,7 @@ use std::error::Error;
 pub trait EntryRepository {
     async fn find_by_word(&self, word: &str) -> Result<Entry, Box<dyn Error>>;
     async fn save(&self, entry: &Entry) -> Result<(), Box<dyn Error>>;
-    async fn delete(&self, entry: &Entry) -> Result<(), Box<dyn Error>>;
+    async fn delete_by_word(&self, word: &str) -> Result<(), Box<dyn Error>>;
 }
 
 #[cfg(test)]
@@ -21,8 +21,8 @@ pub mod tests {
             Option<fn(this: &EntryRepositoryMock, word: &str) -> Result<Entry, Box<dyn Error>>>,
         pub fn_save:
             Option<fn(this: &EntryRepositoryMock, entry: &Entry) -> Result<(), Box<dyn Error>>>,
-        pub fn_delete:
-            Option<fn(this: &EntryRepositoryMock, entry: &Entry) -> Result<(), Box<dyn Error>>>,
+        pub fn_delete_by_word:
+            Option<fn(this: &EntryRepositoryMock, word: &str) -> Result<(), Box<dyn Error>>>,
     }
 
     impl EntryRepositoryMock {
@@ -30,7 +30,7 @@ pub mod tests {
             EntryRepositoryMock {
                 fn_find_by_word: None,
                 fn_save: None,
-                fn_delete: None,
+                fn_delete_by_word: None,
             }
         }
     }
@@ -49,9 +49,9 @@ pub mod tests {
             }
             Ok(())
         }
-        async fn delete(&self, entry: &Entry) -> Result<(), Box<dyn Error>> {
-            if let Some(f) = self.fn_delete {
-                return f(self, entry);
+        async fn delete_by_word(&self, word: &str) -> Result<(), Box<dyn Error>> {
+            if let Some(f) = self.fn_delete_by_word {
+                return f(self, word);
             }
             Ok(())
         }
