@@ -1,6 +1,4 @@
-use super::domain::Dictionary;
 use crate::entry::{application::EntryRepository, domain::Entry};
-use async_trait::async_trait;
 use std::error::Error;
 use std::sync::Arc;
 
