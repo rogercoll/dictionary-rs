@@ -4,9 +4,9 @@ use async_trait::async_trait;
 use sqlx::mysql::MySqlPool;
 use std::error::Error;
 
-const QUERY_FIND_ENTRY_BY_WORD: &str = "SELECT word, definition FROM entries WHERE word = $1";
-const QUERY_DELETE_BY_WORD: &str = "DELETE FROM entries WHERE word = $1";
-const QUERY_UPDATE_ENTRY: &str = "INSERT INTO entries (word, definition) VALUES ($1 $2)";
+const QUERY_FIND_ENTRY_BY_WORD: &str = "SELECT word, definition FROM entries WHERE word = ?";
+const QUERY_DELETE_BY_WORD: &str = "DELETE FROM entries WHERE word = ?";
+const QUERY_UPDATE_ENTRY: &str = "INSERT INTO entries (word, definition) VALUES (?, ?)";
 
 type EntryRow = (String, String); //word, definition
 

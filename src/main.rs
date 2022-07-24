@@ -12,7 +12,7 @@ use tokio::sync::OnceCell;
 const DEFAULT_POOL_SIZE: u32 = 10;
 
 const ENV_MYSQL_DSN: &str = "DATABASE_URL";
-const ENV_MYSQL_POOL: &str = "DATABASE_URL";
+const ENV_MYSQL_POOL: &str = "DATABASE_POOL_SIZE";
 
 static MYSQL_POOL: OnceCell<MySqlPool> = OnceCell::const_new();
 
