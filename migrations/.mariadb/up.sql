@@ -1,0 +1,8 @@
+CREATE DATABASE test;
+GO
+USE test;
+GO
+CREATE TABLE entries (
+	word VARCHAR(100) NOT NULL,
+	definition VARCHAR(300) NOT NULL
+);
