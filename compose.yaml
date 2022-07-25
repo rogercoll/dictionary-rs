@@ -1,0 +1,10 @@
+services:
+  mariadb:
+    container_name: dict-maria-db
+    image: mariadb:latest
+    ports:
+      - 3306:3306
+    environment:
+      MARIADB_ROOT_PASSWORD: your_password
+    volumes:
+      - ./migrations/.mariadb:/docker-entrypoint-initdb.d
