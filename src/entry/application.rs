@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use std::error::Error;
 
 #[async_trait]
-pub trait EntryRepository {
+pub trait EntryRepository: Sync + Send {
     async fn find_by_word(&self, word: &str) -> Result<Entry, Box<dyn Error>>;
     async fn save(&self, entry: &Entry) -> Result<(), Box<dyn Error>>;
     async fn delete_by_word(&self, word: &str) -> Result<(), Box<dyn Error>>;
