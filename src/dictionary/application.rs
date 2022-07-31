@@ -3,11 +3,11 @@ use std::error::Error;
 use std::sync::Arc;
 
 // can contain additional features as user access permissions, random entry return, caching, etc
-pub struct DictionaryApplication<E: EntryRepository> {
-    pub entry_repo: Arc<E>,
+pub struct DictionaryApplication {
+    pub entry_repo: Arc<dyn EntryRepository>,
 }
 
-impl<E: EntryRepository> DictionaryApplication<E> {
+impl DictionaryApplication {
     pub async fn store_definition(
         &self,
         word: &str,
@@ -35,7 +35,7 @@ pub mod tests {
     };
     use std::sync::Arc;
 
-    pub fn new_dictionary_application() -> DictionaryApplication<EntryRepositoryMock> {
+    pub fn new_dictionary_application() -> DictionaryApplication {
         let mut entry_repo = EntryRepositoryMock::new();
         DictionaryApplication {
             entry_repo: Arc::new(entry_repo),
