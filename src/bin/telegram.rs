@@ -2,10 +2,12 @@
 extern crate log;
 
 use dictionary::dictionary::application::DictionaryApplication;
-use dictionary::entry::application::EntryRepository;
+use teloxide::dptree::endpoint;
+
 use dictionary::entry::repository::MySQLEntryRepository;
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 use std::env;
+use std::error::Error;
 use std::sync::Arc;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use tokio::sync::OnceCell;
@@ -41,10 +43,48 @@ async fn get_pool() -> MySqlPool {
 enum Command {
     #[command(description = "display this text.")]
     Help,
-    #[command(description = "handle a username.")]
-    Username(String),
-    #[command(description = "handle a username and an age.", parse_with = "split")]
-    UsernameAndAge { username: String, age: u8 },
+    #[command(description = "get an entry.")]
+    Get(String),
+    #[command(
+        description = "add a new entry into the database.",
+        parse_with = "split"
+    )]
+    Add(String, String),
+}
+
+async fn answer(
+    bot: AutoSend<Bot>,
+    message: Message,
+    app: Arc<DictionaryApplication>,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let text = message.text();
+    if text.is_none() {
+        return Ok(());
+    }
+    if let Ok(command) = Command::parse(text.unwrap(), "DictionaryBot") {
+        match command {
+            Command::Help => {
+                bot.send_message(message.chat.id, Command::descriptions().to_string())
+                    .await?
+            }
+            Command::Get(word) => {
+                let output = match app.get_definition(&word).await {
+                    Ok(def) => format!("{}: {}", word, def),
+                    Err(error) => format!("Error found: {}", error),
+                };
+                bot.send_message(message.chat.id, output).await?
+            }
+            Command::Add(word, definition) => {
+                let output = match app.store_definition(&word, &definition).await {
+                    Ok(_) => return Ok(()),
+                    Err(error) => format!("Error while storing entry: {}", error),
+                };
+                bot.send_message(message.chat.id, output).await?
+            }
+        };
+    }
+
+    Ok(())
 }
 
 #[tokio::main]
@@ -53,22 +93,19 @@ async fn main() {
         pool: MYSQL_POOL.get_or_init(get_pool).await,
     });
 
-    let dict_app = DictionaryApplication {
+    let dict_app = Arc::new(DictionaryApplication {
         entry_repo: entry_repo,
-    };
+    });
 
     let bot = Bot::from_env().auto_send();
 
-    teloxide::commands_repl(
-        bot,
-        |message: Message,
-         bot: AutoSend<Bot>,
-         command: Command,
-         app: Arc<DictionaryApplication>| async move {
-            bot.send_dice(message.chat.id).await?;
-            respond(())
-        },
-        Command::ty(),
-    )
-    .await;
+    let message_handler = Update::filter_message().branch(endpoint(answer));
+
+    let handler = dptree::entry().branch(message_handler);
+    Dispatcher::builder(bot, handler)
+        .dependencies(dptree::deps![dict_app])
+        .enable_ctrlc_handler()
+        .build()
+        .dispatch()
+        .await;
 }
