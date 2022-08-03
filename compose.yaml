@@ -8,3 +8,13 @@ services:
       MARIADB_ROOT_PASSWORD: your_password
     volumes:
       - ./migrations/.mariadb:/docker-entrypoint-initdb.d
+  dictionary:
+    container_name: dictionary-app
+    image: dictionary-rs
+    environment:
+      DATABASE_URL: mysql://root:your_password@mariadb:3306/test
+      TELOXIDE_TOKEN: USE_YOUR_TELEGRAM_TOKEN_HERE
+    depends_on:
+      - mariadb
+    volumes:
+      - ./migrations/.mariadb:/docker-entrypoint-initdb.d
