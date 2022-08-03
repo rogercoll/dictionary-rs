@@ -1,0 +1,11 @@
+FROM rust:latest AS builder
+COPY . .
+RUN cargo build --bin telegram
+
+FROM debian:buster-slim
+RUN apt-get update \
+    && apt-get install -y ca-certificates pkg-config libssl-dev
+
+COPY --from=builder ./target/debug/telegram ./target/debug/telegram
+CMD ["/target/debug/telegram"]
+
