@@ -21,6 +21,10 @@ impl DictionaryApplication {
         let entry = self.entry_repo.find_by_word(word).await?;
         Ok(entry.get_definition().to_string())
     }
+    pub async fn get_all_definitions(&self) -> Result<Vec<Entry>, Box<dyn Error>> {
+        let entries = self.entry_repo.get_all().await?;
+        Ok(entries)
+    }
 }
 
 #[cfg(test)]

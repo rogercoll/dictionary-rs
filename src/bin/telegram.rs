@@ -43,6 +43,8 @@ async fn get_pool() -> MySqlPool {
 enum Command {
     #[command(description = "display this text.")]
     Help,
+    #[command(description = "get all entries.")]
+    GetAll,
     #[command(description = "get an entry.")]
     Get(String),
     #[command(
@@ -66,6 +68,13 @@ async fn answer(
             Command::Help => {
                 bot.send_message(message.chat.id, Command::descriptions().to_string())
                     .await?
+            }
+            Command::GetAll => {
+                let output = match app.get_all_definitions().await {
+                    Ok(def) => format!("{}", def.len()),
+                    Err(error) => format!("Error found: {}", error),
+                };
+                bot.send_message(message.chat.id, output).await?
             }
             Command::Get(word) => {
                 let output = match app.get_definition(&word).await {

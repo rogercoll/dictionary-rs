@@ -16,4 +16,4 @@ sqlx = { version = "0.5.8", features = [
 log = "0.4.17"
 argh = "0.1.8"
 teloxide = { version = "0.10", features = ["macros", "auto-send"] }
-
+futures = "0.3.21"
