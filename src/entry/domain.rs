@@ -13,6 +13,9 @@ impl Entry {
     pub fn get_definition(&self) -> &str {
         &self.definition
     }
+    pub fn get_word(&self) -> &str {
+        &self.word
+    }
 }
 
 #[cfg(test)]

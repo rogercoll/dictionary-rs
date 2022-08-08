@@ -71,7 +71,11 @@ async fn answer(
             }
             Command::GetAll => {
                 let output = match app.get_all_definitions().await {
-                    Ok(def) => format!("{}", def.len()),
+                    Ok(def) => def
+                        .iter()
+                        .map(|entry| format!("{}: {}", entry.get_word(), entry.get_definition()))
+                        .collect::<Vec<String>>()
+                        .join("\n"),
                     Err(error) => format!("Error found: {}", error),
                 };
                 bot.send_message(message.chat.id, output).await?

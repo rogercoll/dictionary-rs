@@ -32,15 +32,12 @@ pub mod tests {
     use super::DictionaryApplication;
     use crate::entry::{
         application::tests::EntryRepositoryMock,
-        domain::{
-            tests::{TEST_DEFAULT_ENTRY_DEFINITION, TEST_DEFAULT_ENTRY_WORD},
-            Entry,
-        },
+        domain::tests::{TEST_DEFAULT_ENTRY_DEFINITION, TEST_DEFAULT_ENTRY_WORD},
     };
     use std::sync::Arc;
 
     pub fn new_dictionary_application() -> DictionaryApplication {
-        let mut entry_repo = EntryRepositoryMock::new();
+        let entry_repo = EntryRepositoryMock::new();
         DictionaryApplication {
             entry_repo: Arc::new(entry_repo),
         }
@@ -48,7 +45,6 @@ pub mod tests {
 
     #[tokio::test]
     async fn store_definition_not_fail() {
-        let mut entry_repo = EntryRepositoryMock::new();
         let app = new_dictionary_application();
         app.store_definition(TEST_DEFAULT_ENTRY_WORD, TEST_DEFAULT_ENTRY_DEFINITION)
             .await
