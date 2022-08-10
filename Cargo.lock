@@ -314,6 +314,7 @@ dependencies = [
  "async_once",
  "futures",
  "log",
+ "rand",
  "sqlx",
  "teloxide",
  "tokio",

@@ -1,4 +1,5 @@
 use crate::entry::{application::EntryRepository, domain::Entry};
+use rand::Rng;
 use std::error::Error;
 use std::sync::Arc;
 
@@ -22,8 +23,11 @@ impl DictionaryApplication {
         Ok(entry.get_definition().to_string())
     }
     pub async fn get_all_definitions(&self) -> Result<Vec<Entry>, Box<dyn Error>> {
-        let entries = self.entry_repo.get_all().await?;
-        Ok(entries)
+        Ok(self.entry_repo.get_all().await?)
+    }
+    pub async fn get_random_definition(&self) -> Result<Entry, Box<dyn Error>> {
+        let mut entries = self.entry_repo.get_all().await?;
+        Ok(entries.remove(rand::thread_rng().gen_range(0..entries.len())))
     }
 }
 

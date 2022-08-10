@@ -45,6 +45,8 @@ enum Command {
     Help,
     #[command(description = "get all entries.")]
     GetAll,
+    #[command(description = "get a random entry.")]
+    GetRandom,
     #[command(description = "get an entry.")]
     Get(String),
     #[command(
@@ -76,6 +78,13 @@ async fn answer(
                         .map(|entry| format!("{}: {}", entry.get_word(), entry.get_definition()))
                         .collect::<Vec<String>>()
                         .join("\n"),
+                    Err(error) => format!("Error found: {}", error),
+                };
+                bot.send_message(message.chat.id, output).await?
+            }
+            Command::GetRandom => {
+                let output = match app.get_random_definition().await {
+                    Ok(entry) => format!("{}: {}", entry.get_word(), entry.get_definition()),
                     Err(error) => format!("Error found: {}", error),
                 };
                 bot.send_message(message.chat.id, output).await?
