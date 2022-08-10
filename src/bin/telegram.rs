@@ -49,6 +49,8 @@ enum Command {
     GetRandom,
     #[command(description = "get an entry.")]
     Get(String),
+    #[command(description = "delete an entry.")]
+    Delete(String),
     #[command(
         description = "add a new entry into the database.",
         parse_with = "split"
@@ -96,9 +98,16 @@ async fn answer(
                 };
                 bot.send_message(message.chat.id, output).await?
             }
+            Command::Delete(word) => {
+                let output = match app.delete_definition(&word).await {
+                    Ok(_) => format!("Entry deleted successfully"),
+                    Err(error) => format!("Error found: {}", error),
+                };
+                bot.send_message(message.chat.id, output).await?
+            }
             Command::Add(word, definition) => {
                 let output = match app.store_definition(&word, &definition).await {
-                    Ok(_) => return Ok(()),
+                    Ok(_) => format!("Entry added successfully"),
                     Err(error) => format!("Error while storing entry: {}", error),
                 };
                 bot.send_message(message.chat.id, output).await?
@@ -111,6 +120,8 @@ async fn answer(
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     let entry_repo = Arc::new(MySQLEntryRepository {
         pool: MYSQL_POOL.get_or_init(get_pool).await,
     });
@@ -119,10 +130,12 @@ async fn main() {
         entry_repo: entry_repo,
     });
 
+    info!("Loading Telegram Bot configuration from env");
     let bot = Bot::from_env().auto_send();
 
     let message_handler = Update::filter_message().branch(endpoint(answer));
 
+    info!("Launching bot dispacher");
     let handler = dptree::entry().branch(message_handler);
     Dispatcher::builder(bot, handler)
         .dependencies(dptree::deps![dict_app])

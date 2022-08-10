@@ -29,6 +29,9 @@ impl DictionaryApplication {
         let mut entries = self.entry_repo.get_all().await?;
         Ok(entries.remove(rand::thread_rng().gen_range(0..entries.len())))
     }
+    pub async fn delete_definition(&self, word: &str) -> Result<(), Box<dyn Error>> {
+        Ok(self.entry_repo.delete_by_word(word).await?)
+    }
 }
 
 #[cfg(test)]

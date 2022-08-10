@@ -62,6 +62,7 @@ impl<'a> EntryRepository for MySQLEntryRepository<'a> {
 
         Ok(())
     }
+
     async fn delete_by_word(&self, word: &str) -> Result<(), Box<dyn Error>> {
         sqlx::query(QUERY_DELETE_BY_WORD)
             .bind(word)
